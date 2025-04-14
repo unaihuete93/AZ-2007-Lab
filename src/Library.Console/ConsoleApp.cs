@@ -182,6 +182,12 @@ public class ConsoleApp
 
     async Task<ConsoleState> PatronDetails()
     {
+        if (selectedPatronDetails == null)
+        {
+            Console.WriteLine("No patron details available.");
+            return ConsoleState.PatronSearch;
+        }
+
         Console.WriteLine($"Name: {selectedPatronDetails.Name}");
         Console.WriteLine($"Membership Expiration: {selectedPatronDetails.MembershipEnd}");
         Console.WriteLine();
@@ -270,5 +276,34 @@ public class ConsoleApp
         }
 
         throw new InvalidOperationException("An input option is not handled.");
+    }
+
+    async Task<ConsoleState> SearchBooks()
+    {
+        Console.Write("Enter a string to search for books by title: ");
+        string? searchInput = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(searchInput))
+        {
+            Console.WriteLine("Invalid input. Please try again.");
+            return ConsoleState.PatronDetails;
+        }
+
+        var matchingBooks = await _patronRepository.SearchBooks(searchInput);
+
+        if (matchingBooks.Count == 0)
+        {
+            Console.WriteLine("No matching books found.");
+        }
+        else
+        {
+            Console.WriteLine("Matching Books:");
+            foreach (var book in matchingBooks)
+            {
+                Console.WriteLine($"- {book.Title} by {book.Author.Name}");
+            }
+        }
+
+        return ConsoleState.PatronDetails;
     }
 }
