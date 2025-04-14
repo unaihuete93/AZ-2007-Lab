@@ -70,4 +70,22 @@ public class JsonPatronRepository : IPatronRepository
             await _jsonData.LoadData();
         }
     }
+
+    public async Task<List<Book>> SearchBooks(string searchInput)
+    {
+        await _jsonData.EnsureDataLoaded();
+
+        List<Book> searchResults = new List<Book>();
+        foreach (Book book in _jsonData.Books)
+        {
+            if (book.Title.Contains(searchInput, StringComparison.OrdinalIgnoreCase))
+            {
+                searchResults.Add(book);
+            }
+        }
+
+        searchResults.Sort((b1, b2) => string.Compare(b1.Title, b2.Title, StringComparison.OrdinalIgnoreCase));
+
+        return searchResults;
+    }
 }
